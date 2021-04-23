@@ -8,6 +8,6 @@ int main()
 
     r = factorial(n);
 
-    printf("factorial of %d is %d\n",n,r);
+    printf("Factorial of %d is %d\n",n,r);
     
 }
