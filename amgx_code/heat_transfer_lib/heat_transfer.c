@@ -1,6 +1,9 @@
 #include <stdlib.h>
+#include <stdio.h>
 #include <string.h>
 #include "amgaxb_headers.h"
+#include "amgx_c.h"
+
 //#include "cuda_runtime.h"
 
 /* CUDA error macro */
@@ -35,7 +38,7 @@ void print_callback(const char *msg, int length)
 
 
 //int main(int argc, const char **argv)
-solveAMG(double[] data, int[] col_ind, int[] row_ptr, double[] rhs, double[] x) 
+void solveAMG(double data[], int col_ind[], int row_ptr[], double rhs[], double xi[]) 
 {
     //input matrix and rhs/solution
     int n = 0;
@@ -155,5 +158,5 @@ solveAMG(double[] data, int[] col_ind, int[] row_ptr, double[] rhs, double[] x)
     amgx_libclose(lib_handle);
 #endif
     //CUDA_SAFE_CALL(cudaDeviceReset());
-    return status;
+    //return status;
 }

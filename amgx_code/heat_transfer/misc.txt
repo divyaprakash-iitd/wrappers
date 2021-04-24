@@ -1,0 +1,8 @@
+INC_D = -I/usr/local/cuda/include -I/home/divyaprakash/AMGX/base/include
+LIB_D = -L/usr/local/cuda/lib64 -L/home/divyaprakash/AMGX/build
+LIB_L = -lcusparse -lcublas -lcudart -ldl
+
+# Examples
+amgx_capi:
+	gcc -O2 -std=c99 heat_transfer.c -c $(INC_D)
+	g++ -O2 heat_transfer.o -o heat_transfer -L/usr/local/cuda/lib64 -L/home/divyaprakash/AMGX/build -lcusparse -lcublas -lcudart -ldl -L. -lamgxsh

@@ -1,5 +1,6 @@
-#include<stdio.h>
+#include <stdio.h>
 #include "amgaxb_headers.h"
+#include "amgx_c.h"
 
 int main () 
 {
@@ -10,5 +11,6 @@ int main ()
     double rhs[] = {-300, 0, 0, -100};
     double x[] = {0, 0, 0, 0};    
 
-    solveAMG(data, col_ind, row_ptr, rhs, x) 
+    solveAMG(data, col_ind, row_ptr, rhs, x);
+    return 0; 
 }
