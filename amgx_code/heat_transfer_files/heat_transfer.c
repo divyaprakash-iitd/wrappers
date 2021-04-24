@@ -1,22 +1,6 @@
 #include <stdlib.h>
 #include <string.h>
-//#include "cuda_runtime.h"
-
-/* CUDA error macro */
-#define CUDA_SAFE_CALL(call) do {                                 \
-  cudaError_t err = call;                                         \
-  if(cudaSuccess != err) {                                        \
-    fprintf(stderr, "Cuda error in file '%s' in line %i : %s.\n", \
-            __FILE__, __LINE__, cudaGetErrorString( err) );       \
-    exit(EXIT_FAILURE);                                           \
-  } } while (0)
-
-/* standard or dynamically load library */
-#ifdef AMGX_DYNAMIC_LOADING
-#include "amgx_capi.h"
-#else
 #include "amgx_c.h"
-#endif
 
 /* print error message and exit */
 void errAndExit(const char *err)
