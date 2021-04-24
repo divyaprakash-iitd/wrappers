@@ -1,5 +1,6 @@
 #include <stdlib.h>
 #include <string.h>
+#include "amgaxb_headers.h"
 //#include "cuda_runtime.h"
 
 /* CUDA error macro */
@@ -33,7 +34,8 @@ void print_callback(const char *msg, int length)
 }
 
 
-int main(int argc, const char **argv)
+//int main(int argc, const char **argv)
+solveAMG(double[] data, int[] col_ind, int[] row_ptr, double[] rhs, double[] x) 
 {
     //input matrix and rhs/solution
     int n = 0;
@@ -104,9 +106,9 @@ int main(int argc, const char **argv)
 
     /* Input your own matrix */
 
-    double data[] = {-2, 1, 1, -2, 1, 1, -2, 1, 1, -2 };
+    /*double data[] = {-2, 1, 1, -2, 1, 1, -2, 1, 1, -2 };
     int col_ind[] = {0, 1, 0, 1, 2, 1, 2, 3, 2, 3};
-    int row_ptr[] = {0, 2, 5, 8, 10};  
+    int row_ptr[] = {0, 2, 5, 8, 10};*/
 
     int N = 4; int nnz = 10; int block_dimx = 1; int block_dimy = 1;
     AMGX_matrix_upload_all(A, N, nnz, block_dimx, block_dimy, row_ptr, col_ind, data, 0);
@@ -115,7 +117,7 @@ int main(int argc, const char **argv)
     AMGX_matrix_get_size(A, &n, &bsize_x, &bsize_y);
 
     /* Input your RHS vector */
-    double rhs[] = {-300, 0, 0, -100};
+    //double rhs[] = {-300, 0, 0, -100};
     //AMGX_pin_memory(rhs);
     AMGX_vector_upload(b, 4, 1, rhs);
     
