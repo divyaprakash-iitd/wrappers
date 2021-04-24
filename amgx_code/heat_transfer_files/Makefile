@@ -9,10 +9,9 @@
 # CUDA Toolkit location
 INC_D = -I/usr/local/cuda/include -I/home/divyaprakash/AMGX/base/include
 LIB_D = -L/usr/local/cuda/lib64 -L/home/divyaprakash/AMGX/build
-LIB_L = -lcusparse -lcublas -lcudart -ldl
+LIB_L = -lcusparse -lcublas -lcudart -ldl -lamgxsh
 
 # Examples
 amgx_capi:
 	gcc -O2 -std=c99 heat_transfer.c -c $(INC_D)
-	g++ -O2 heat_transfer.o -o heat_transfer $(LIB_D) $(LIB_L) -L. -lamgxsh
-# g++ -O2 heat_transfer.o -o heat_transfer $(LIB_D) $(LIB_L) -L../lib -lamgxsh -Wl,-rpath=../lib
+	g++ -O2 heat_transfer.o -o heat_transfer $(LIB_D) $(LIB_L)
