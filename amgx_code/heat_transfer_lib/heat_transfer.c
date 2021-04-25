@@ -4,8 +4,7 @@
 #include "amgaxb_headers.h"
 #include "amgx_c.h"
 
-//#include "cuda_runtime.h"
-
+//#include "cuda_runtime.h" 
 /* CUDA error macro */
 #define CUDA_SAFE_CALL(call) do {                                 \
   cudaError_t err = call;                                         \
@@ -38,7 +37,7 @@ void print_callback(const char *msg, int length)
 
 
 //int main(int argc, const char **argv)
-void solveAMG(double data[], int col_ind[], int row_ptr[], double rhs[], double xi[]) 
+void solveAMG(double data[], int col_ind[], int row_ptr[], double rhs[], double *sol) 
 {
     //input matrix and rhs/solution
     int n = 0;
@@ -140,7 +139,7 @@ void solveAMG(double data[], int col_ind[], int row_ptr[], double rhs[], double 
     AMGX_solver_get_status(solver, &status);
     /* example of how to write the linear system to the output */
     
-
+    AMGX_vector_download(x,sol);
     AMGX_write_system(A, b, x, "output.system.mtx");
     /* destroy resources, matrix, vector and solver */
     AMGX_solver_destroy(solver);
