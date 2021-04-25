@@ -1,6 +1,5 @@
 #include <stdio.h>
 #include "amgaxb_headers.h"
-#include "amgx_c.h"
 
 int main () 
 {
