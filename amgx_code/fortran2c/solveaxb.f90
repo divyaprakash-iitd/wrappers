@@ -17,7 +17,10 @@ program solveaxb
     rhs = (/-300, 0, 0, -100/)
     sol = (/-300, 0, 0, -100/)
     
-    call solveamg(c_loc(datam), c_loc(col_ind), c_loc(row_ptr),c_loc(rhs),c_loc(sol))  
+    write(*,*) solveamg(c_loc(datam), c_loc(col_ind), c_loc(row_ptr),c_loc(rhs),c_loc(sol)) 
+
+    write(*,100) ( real(sol(i)), i=1,4 ) 
+    100 format (4(F14.7))
  
    ! print *, datam
    ! print *, col_ind

@@ -6,7 +6,7 @@ LIB_L = -lht
 OBJECTS=ftn_c.o solveaxb.o
 
 solveaxb: $(OBJECTS) 
-	$(FORT) -o $@ $(OBJECTS) -$(LIB_D) $(LIB_L)
+	$(FORT) -o $@ $(OBJECTS) $(LIB_D) $(LIB_L)
 
 ftn_c.o: ftn_c.f90 Makefile
 	$(FORT) -c $<

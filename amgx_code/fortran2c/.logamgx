@@ -1,0 +1,3 @@
+AMGX_LOG	RUNTIME_VERSION=10.1
+AMGX_LOG	Devicetype=device
+AMGX_LOG	Devicetype=host
