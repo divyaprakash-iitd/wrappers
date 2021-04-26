@@ -37,7 +37,7 @@ void print_callback(const char *msg, int length)
 
 
 //int main(int argc, const char **argv)
-int solveAMG(double data[], int col_ind[], int row_ptr[], double rhs[], double *sol) 
+int solveamg(double *data, int *col_ind, int *row_ptr, double *rhs, double *sol) 
 {
     //input matrix and rhs/solution
     int n = 0;

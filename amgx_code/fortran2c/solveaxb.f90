@@ -17,7 +17,7 @@ program solveaxb
     rhs = (/-300, 0, 0, -100/)
     sol = (/-300, 0, 0, -100/)
     
-    call solveAMG(c_loc(mtx), c_loc(col_ind), c_loc(row_ptr),c_loc(rhs),c_loc(sol))  
+    call solveamg(c_loc(mtx), c_loc(col_ind), c_loc(row_ptr),c_loc(rhs),c_loc(sol))  
  
    ! print *, mtx
    ! print *, col_ind

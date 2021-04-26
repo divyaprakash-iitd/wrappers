@@ -11,7 +11,7 @@ int main ()
     double rhs[] = {-300, 0, 0, -100};
     double sol[4];    
 
-    solveAMG(data, col_ind, row_ptr, rhs, sol);
+    solveamg(data, col_ind, row_ptr, rhs, sol);
     for (i=0;i<4;i++)
     {
         printf("%lf\n",sol[i]);
