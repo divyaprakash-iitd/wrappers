@@ -37,7 +37,7 @@ void print_callback(const char *msg, int length)
 
 
 //int main(int argc, const char **argv)
-int solveamg(double *data, int *col_ind, int *row_ptr, double *rhs, double *sol) 
+int solveamg(int *crs_data, double *data, int *col_ind, int *row_ptr, double *rhs, double *sol) 
 {
     //input matrix and rhs/solution
     int n = 0;
@@ -112,7 +112,11 @@ int solveamg(double *data, int *col_ind, int *row_ptr, double *rhs, double *sol)
     int col_ind[] = {0, 1, 0, 1, 2, 1, 2, 3, 2, 3};
     int row_ptr[] = {0, 2, 5, 8, 10};*/
 
-    int N = 4; int nnz = 10; int block_dimx = 1; int block_dimy = 1;
+    // int N = 4; int nnz = 10; int block_dimx = 1; int block_dimy = 1;
+    
+    int N; int nnz; int block_dimx; int block_dimy;
+    N = crs_data[0]; nnz = crs_data[1]; block_dimx = crs_data[2]; block_dimy = crs_data[3];
+    
     AMGX_matrix_upload_all(A, N, nnz, block_dimx, block_dimy, row_ptr, col_ind, data, 0);
 
     
