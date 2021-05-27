@@ -125,7 +125,7 @@ int solveamg(int *crs_data, double *data, int *col_ind, int *row_ptr, double *rh
     /* Input your RHS vector */
     //double rhs[] = {-300, 0, 0, -100};
     //AMGX_pin_memory(rhs);
-    AMGX_vector_upload(b, 4, 1, rhs);
+    AMGX_vector_upload(b, crs_data[0], 1, rhs);
     
     AMGX_vector_get_size(x, &sol_size, &sol_bsize);
     /* Input your initial guess, x */
