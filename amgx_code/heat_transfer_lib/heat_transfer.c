@@ -144,7 +144,7 @@ int solveamg(int *crs_data, double *data, int *col_ind, int *row_ptr, double *rh
     /* example of how to write the linear system to the output */
     
     AMGX_vector_download(x,sol);
-    AMGX_write_system(A, b, x, "output.system.mtx");
+    //AMGX_write_system(A, b, x, "output.system.mtx");
     /* destroy resources, matrix, vector and solver */
     AMGX_solver_destroy(solver);
     AMGX_vector_destroy(x);
