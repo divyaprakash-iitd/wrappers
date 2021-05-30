@@ -7,8 +7,9 @@ program ht1dn
     integer :: nnz, n_row_ptr, row, n_row, b_size, i, id
     real (c_double), dimension(:), allocatable, target :: datam, rhs, sol
     integer (c_int), dimension(:), allocatable, target :: col_ind, row_ptr, crs_data
-
-    N = 1e6
+    real :: start, finish
+    
+    N = 1e1
     nnz = 2*2 + 3*(N-2);
 
     n_row = N+1; b_size = N;
@@ -36,17 +37,24 @@ program ht1dn
     row_ptr(1) = 0
     row_ptr(N+1) = nnz 
 
+    ! Boundary conditions
     rhs = 0.0d0
     rhs(1) = -300
     rhs(N) = -100
     
+    ! Solution vector
     sol = 0.0d0
     
     ! crs data = (N, nnz, block_dimx, block_dimy)
     crs_data = (/N, nnz, 1, 1/)
     
-    write(*,*) solveamg(c_loc(crs_data), c_loc(datam), c_loc(col_ind), c_loc(row_ptr),c_loc(rhs),c_loc(sol)) 
+    call cpu_time(start)    
 
+    write(*,*) solveamg(c_loc(crs_data), c_loc(datam), c_loc(col_ind), c_loc(row_ptr),c_loc(rhs),c_loc(sol)) 
+    
+    call cpu_time(finish)
+
+    print '("Time = ",f6.3," seconds.")',finish-start
     !write(*,100) ( real(sol(i)), i=1,N ) 
     !100 format (10000(F14.7))
  
@@ -54,5 +62,6 @@ program ht1dn
     !print *, col_ind
     !print *, row_ptr
     !print *, rhs
+    print *, sol(N)
         
 end program ht1dn
