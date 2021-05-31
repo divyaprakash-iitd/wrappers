@@ -6,7 +6,7 @@ program coefficient_matrix
     integer(4)                              :: id, i, j, k, m, row, NNZ, N, flag ! Ni, Nj, Nk, row
     integer(8), dimension(:), allocatable   :: col_ind, row_ptr
 
-    real(8), dimension(Ni*Nj*Nk,Ni*Nj*Nk)   :: C ! Coefficient Matrix
+    real(8), dimension(Ni*Nj*Nk)   :: C ! Coefficient Matrix
     real(8), dimension(Ni*Nj*Nk)            :: deltayp, deltayv
     real(8)                                 :: dx, dy, invdeltax2, invdeltaz2
     real(8), dimension(Ni*Nj*Nk)            :: b, x
@@ -50,45 +50,45 @@ program coefficient_matrix
     ! Coefficient Matrix
     row = 1
     NZ = 1
-    C = 0.0d0
     do k =1,Nk
         do j = 1,Nj
             do i = 1,Ni
+                C = 0.0d0
                 ! x-direction
-                C(row, idx(i-1,j,k,Ni,Nj,Nk)) = invdeltax2
-                C(row, idx(i+1,j,k,Ni,Nj,Nk)) = invdeltax2
+                C(idx(i-1,j,k,Ni,Nj,Nk)) = invdeltax2
+                C(idx(i+1,j,k,Ni,Nj,Nk)) = invdeltax2
                 ! z-direction
-                C(row, idx(i,j,k-1,Ni,Nj,Nk)) = invdeltaz2
-                C(row, idx(i,j,k+1,Ni,Nj,Nk)) = invdeltaz2
+                C(idx(i,j,k-1,Ni,Nj,Nk)) = invdeltaz2
+                C(idx(i,j,k+1,Ni,Nj,Nk)) = invdeltaz2
                 ! y-direction
                 if (j.eq.1) then
-                    C(row, idx(i,j+1,k,Ni,Nj,Nk)) = 1/deltayv(j+1)/deltayp(j)
+                    C(idx(i,j+1,k,Ni,Nj,Nk)) = 1/deltayv(j+1)/deltayp(j)
                     ! Center Node
-                    C(row, idx(i,j,k,Ni,Nj,Nk))   = -2*invdeltax2 - 2*invdeltaz2 -1/deltayv(j+1)/deltayp(j)
+                    C(idx(i,j,k,Ni,Nj,Nk))   = -2*invdeltax2 - 2*invdeltaz2 -1/deltayv(j+1)/deltayp(j)
                 
                 else if (j.eq.Nj) then
-                    C(row, idx(i,j-1,k,Ni,Nj,Nk)) = 1/deltayv(j)/deltayp(j)
+                    C(idx(i,j-1,k,Ni,Nj,Nk)) = 1/deltayv(j)/deltayp(j)
                     ! Center Node
-                    C(row, idx(i,j,k,Ni,Nj,Nk))   = -2*invdeltax2 - 2*invdeltaz2 -1/deltayv(j)/deltayp(j)
+                    C(idx(i,j,k,Ni,Nj,Nk))   = -2*invdeltax2 - 2*invdeltaz2 -1/deltayv(j)/deltayp(j)
 
                 else
-                    C(row, idx(i,j-1,k,Ni,Nj,Nk)) = 1/deltayv(j)/deltayp(j)
-                    C(row, idx(i,j+1,k,Ni,Nj,Nk)) = 1/deltayv(j+1)/deltayp(j)
+                    C(idx(i,j-1,k,Ni,Nj,Nk)) = 1/deltayv(j)/deltayp(j)
+                    C(idx(i,j+1,k,Ni,Nj,Nk)) = 1/deltayv(j+1)/deltayp(j)
                     ! Center Node
-                    C(row, idx(i,j,k,Ni,Nj,Nk))   = -2*invdeltax2 - 2*invdeltaz2 -1/deltayp(j)*(1/deltayv(j+1) + 1/deltayv(j))
+                    C(idx(i,j,k,Ni,Nj,Nk))   = -2*invdeltax2 - 2*invdeltaz2 -1/deltayp(j)*(1/deltayv(j+1) + 1/deltayv(j))
                 
                 end if
                 
                 ! Inspect the row for non-zero elements               
                 flag = 0
                 do m = 1,N
-                    if (abs(C(row,m)) > 1e-14) then
+                    if (abs(C(m)) > 1e-14) then
                         if (flag == 0) then
                             row_ptr(row) = NZ - 1
                             flag = 1
                         end if
                     
-                        val(NZ) = C(row,m)
+                        val(NZ) = C(m)
                         col_ind(NZ) = m - 1
                         NZ = NZ + 1
                     end if
