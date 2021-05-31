@@ -91,7 +91,7 @@ for k =1:Nk
 	end
 end
 
-%spy(C)
+spy(C)
 
 function id = idx(i,j,k)
 % Transforms 3D location to 1D
