@@ -4,7 +4,7 @@ clear; clc; close all;
 TL = 300;
 TR = 100;
 
-n = 1e3; % Number of grid points, including boundary nodes
+n = 6; % Number of grid points, including boundary nodes
 N = n-2; % Number of unknowns
 
 A1 = diag(ones(1,N-1),1);
