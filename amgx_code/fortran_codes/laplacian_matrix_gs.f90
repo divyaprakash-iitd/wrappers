@@ -6,7 +6,7 @@ program coefficient_matrix
     integer(4)                              :: id, i, j, k, m, row, NNZ, N, flag ! Ni, Nj, Nk, row
     integer(8), dimension(:), allocatable   :: col_ind, row_ptr
 
-    real(8), dimension(Ni*Nj*Nk)   :: C ! Coefficient Matrix
+    real(8), dimension(Ni*Nj*Nk)            :: C ! Coefficient Matrix
     real(8), dimension(Ni*Nj*Nk)            :: deltayp, deltayv
     real(8)                                 :: dx, dy, invdeltax2, invdeltaz2
     real(8), dimension(Ni*Nj*Nk)            :: b, x
@@ -42,7 +42,7 @@ program coefficient_matrix
             end do
         end do
     end do
-    
+ 
     ! Allocate arrays
 
     allocate(val(NNZ),col_ind(NNZ),row_ptr(N+1))
@@ -103,7 +103,7 @@ program coefficient_matrix
     print *, N
     !print *, col_ind
     !print *, val
-    print *, row_ptr
+    !print *, row_ptr
     !i =1; j = 1; k = 1
     !id = idx(i,j,k,Ni,Nj,Nk)
     !print *, "Transformed id: "

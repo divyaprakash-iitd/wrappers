@@ -91,8 +91,14 @@ int solveamg(int *crs_data, double *data, int *col_ind, int *row_ptr, double *rh
     mode = AMGX_mode_dDDI;
 
     /* Specify configuration */
-    AMGX_SAFE_CALL(AMGX_config_create(&cfg, "config_version=2, solver(amg_solver)=AMG"));
+    //AMGX_SAFE_CALL(AMGX_config_create(&cfg, "config_version=2, solver(amg_solver)=AMG"));
+    AMGX_SAFE_CALL(AMGX_config_create(&cfg, "config_version=2, solver(amg_solver)=AMG,print_solve_stats=1,print_grid_stats=1,max_iters=1e6,tolerance=1e-10,norm=L2,monitor_residual=1,print_solve_stats=1")); 
+    //AMGX_SAFE_CALL(AMGX_config_create(&cfg, "config_version= 2, use_scalar_norm= 1,solver= BLOCK_JACOBI,print_solve_stats= 1, obtain_timings= 1,monitor_residual= 1, convergence= RELATIVE_INI_CORE, tolerance= 1e-14, norm= L2,max_iters=10000"));
 
+   //AMGX_SAFE_CALL(AMGX_config_create(&cfg, "config_version= 2, determinism_flag= 1, print_grid_stats= 1, max_uncolored_percentage= 0.15, algorithm= AGGREGATION, obtain_timings= 1, solver= AMG, smoother= MULTICOLOR_GS, print_solve_stats= 1, presweeps= 1, symmetric_GS= 1, selector= SIZE_2, coarsest_sweeps= 2, max_iters= 1000, monitor_residual= 1, postsweeps= 1, max_levels= 1000, matrix_coloring_scheme= MIN_MAX, tolerance= 0.1, norm= L1, cycle= V"));
+
+  //AMGX_SAFE_CALL(AMGX_config_create(&cfg, "config_version= 2, solver= AMG, smoother= MULTICOLOR_GS, max_iters= 1000, tolerance= 1e-6, norm= L2"));
+    
     /* create resources, matrix, vector and solver */
     AMGX_resources_create_simple(&rsrc, cfg);
     AMGX_matrix_create(&A, rsrc, mode);

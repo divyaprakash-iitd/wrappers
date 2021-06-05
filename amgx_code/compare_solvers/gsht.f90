@@ -2,13 +2,14 @@ program gsht
     implicit none
 
     ! Declare variables
-    integer, parameter :: N         = 1E6 ! Number of unknowns
+    integer, parameter :: N         = 1E3 ! Number of unknowns
     integer, parameter :: NN        = 3
     integer, parameter :: LEFT      = 1
     integer, parameter :: CENTER    = 2
     integer, parameter :: RIGHT     = 3
-    integer, parameter :: MAXITER   = 1000
+    integer, parameter :: MAXITER   = 1E6
     
+    integer :: ierror
     integer :: i, ITER
     real(8) ::TL, TR, TTemp            
     real(8), dimension(N,NN) :: A
@@ -42,7 +43,7 @@ program gsht
     
     call cpu_time(start)    
     ! Stopping criteria
-    TOLERANCE = 1E-14
+    TOLERANCE = 1E-10
     ER = 1.0d0
     ITER = 0
     do while ((ITER < MAXITER).and.(ER > TOLERANCE))
@@ -74,4 +75,10 @@ program gsht
     
     print '("Time = ",f6.3," seconds.")',finish-start
     print *, T(N)
+    print *, ITER
+    print *, ER
+    
+    open(unit=8, file='gs_data.dat',status='replace',action='write', iostat=ierror)
+    write(8,100) T
+    100 format (F10.2)
 end program gsht

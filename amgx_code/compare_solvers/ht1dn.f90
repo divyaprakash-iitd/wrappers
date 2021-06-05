@@ -3,13 +3,14 @@ program ht1dn
     use ftn_c
     implicit none
     ! Declare variables
+    integer :: ierror
     integer :: N ! Number of unknowns
     integer :: nnz, n_row_ptr, row, n_row, b_size, i, id
     real (c_double), dimension(:), allocatable, target :: datam, rhs, sol
     integer (c_int), dimension(:), allocatable, target :: col_ind, row_ptr, crs_data
     real :: start, finish
     
-    N = 1e1
+    N = 1e3
     nnz = 2*2 + 3*(N-2);
 
     n_row = N+1; b_size = N;
@@ -63,5 +64,9 @@ program ht1dn
     !print *, row_ptr
     !print *, rhs
     print *, sol(N)
-        
+           
+    open(unit=8, file='amgx_data.dat',status='replace',action='write', iostat=ierror)
+    write(8,100) sol
+    100 format (F10.2)
+
 end program ht1dn
