@@ -1,7 +1,6 @@
-program ht2d
-    use dataht
+module dataht
     implicit none
-    
+
     ! Heat Transfer Parameters
     real(8), parameter :: eGen    = 5000   ! Uniform Heat Generation           [W/m^3]
     real(8), parameter :: k       = 2      ! Thermal Conductivity              [w/m/C]
@@ -29,25 +28,46 @@ program ht2d
     integer(8) :: LEFT, RIGHT, TOP, BOTTOM, CENTER
 
     ! Declare Function Variable
-    integer(8) :: id
+    !integer(8) :: id
 
-    !NNN = 16
+    contains
+    subroutine init() 
+        ! Calculate Number of Grid Points and Total Number of Unknowns
+        Ni = ceiling(Lx/delta) + 1
+        Nj = ceiling(Ly/delta) + 1
+        N  = (Ni-1)*Nj 
 
-    ! Calculate Number of Grid Points and Total Number of Unknowns
-    Ni = floor(Lx/delta) + 1
-    Nj = floor(Ly/delta) + 1
-    N  = (Ni-1)*Nj 
-
-    ! Allocate Matrices and Vectors
-    allocate(A(Ni,Nj))
-    allocate(b(N))
-    allocate(T(N))
+        ! Allocate Matrices and Vectors
+        allocate(A(Ni,Nj))
+        allocate(b(N))
+        allocate(T(N))
+        
+        ! Initialize  Matrices and Vectors
+        A = 0.0d0
+        b = 0.0d0
+        T = 0.0d0
+    end subroutine
     
-    ! Initialize  Matrices and Vectors
-    A = 0.0d0
-    b = 0.0d0
-    T = 0.0d0
+    function id(i,j)
+    implicit none
+        ! Dummy arguments
+        integer(8) :: id
 
+        ! Local variables
+        integer(8)  :: i,j
+
+        id = (j-1)*(Ni-1) + i     
+        !print *,Ni
+    end function id      
+end module dataht
+
+program ht2d
+    use dataht
+    implicit none
+    
+    ! Initialize variables
+    call init()
+    print *,Ni
     ! Fill up the Coefficient Matrix
     row = 1
     do j = 1,Nj
@@ -138,21 +158,6 @@ program ht2d
             row = row + 1 
         end do
     end do
-    
-
 end program ht2d
 
 
-function id(i,j)
-use dataht
-implicit none
-    ! Dummy arguments
-    integer(8) :: id
-
-    ! Local variables
-    integer(8)  :: i,j,Ni
-
-    Ni = NNN
-    id = (j-1)*(Ni-1) + i     
-
-end function id      
