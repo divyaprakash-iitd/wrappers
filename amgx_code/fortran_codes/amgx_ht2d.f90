@@ -7,19 +7,19 @@ module dataht
     real(8), parameter :: hT      = 70     ! Heat Transfer Coefficient, Top    [W/m^2/K]
     real(8), parameter :: hB      = 10     ! Heat Transfer Coefficient, Bottom [W/m^2/K]
     real(8), parameter :: Tinf    = 25     ! Ambient Temperature               [C]
-    real(8), parameter :: delta   = 0.05    ! Mesh Size                         [m]
+    real(8), parameter :: delta   = 0.01    ! Mesh Size                         [m]
     real(8), parameter :: qf      = 500    ! Heat Flux                         [W/m^2]
     real(8), parameter :: Tright  = 45     ! Right Boundary Temperature        [C]
     real(8), parameter :: Lx      = 1.5    ! X-Dimension of Plate              [m]
     real(8), parameter :: Ly      = 1      ! Y-Dimension of Plate              [m]
  
     ! Grid Parameters
-    integer(8) :: Ni    ! Number of Grid Points (x-direction)
-    integer(8) :: Nj    ! Number of Grid Points (y-direction)
-    integer(8) :: N     ! Number of Unknowns
+    integer :: Ni    ! Number of Grid Points (x-direction)
+    integer :: Nj    ! Number of Grid Points (y-direction)
+    integer :: N     ! Number of Unknowns
 
     ! Declare Matrices and Vectors
-    real(8), dimension(:,:), allocatable    :: A    ! Coefficient Matrix
+    real(8), dimension(:), allocatable      :: A    ! Coefficient Matrix
     real(8), dimension(:), allocatable      :: b    ! RHS Vector
     real(8), dimension(:), allocatable      :: T    ! Unknown (Temperature Distribution)
 
@@ -29,11 +29,6 @@ module dataht
 
     ! Declare Function Variable
     !integer(8) :: id
-   
-    ! Variables to run the gs_sor subroutine
-    real(8) :: eps   = 1e-6
-    real(8) :: omega = 0.9
-    integer, parameter :: iter  = 1000
     
     contains
     subroutine init() 
@@ -43,7 +38,7 @@ module dataht
         N  = (Ni-1)*Nj 
 
         ! Allocate Matrices and Vectors
-        allocate(A(N,N))
+        allocate(A(N))
         allocate(b(N))
         allocate(T(N))
         
@@ -57,7 +52,7 @@ module dataht
     implicit none
         
         ! Calling parameters
-        integer(8), intent(in)                  :: n
+        integer, intent(in)                  :: n
         real(8), intent(in), dimension(n,n)     :: A
         real(8), intent(in), dimension(n)       :: b
         real(8), intent(inout), dimension(n)    :: T
@@ -137,6 +132,9 @@ program ht2d
 
     ! Declare Time Variables
     real :: start, finish
+
+    ! Miscellaneous Variables
+    integer :: ret ! Stores the return value of AMGX function
  
     ! Initialize variables
     call init()
@@ -147,11 +145,17 @@ program ht2d
     NNZ = NNZ + (2*(Ni-3) + 2*(Nj-2))*4     ! Boundary Nodes
     NNZ = NNZ + 4*3                         ! Corner Nodes
     
+    ! Allocate arrays for CRS matrix
+    allocate(val(NNZ),col_ind(NNZ),row_ptr(N+1))
+    row_ptr(N+1) = NNZ + 1 
+    
     ! Fill up the Coefficient Matrix
     row = 1
+    NNZ = 1
     do j = 1,Nj
         do i = 1,Ni-1
-            
+            A = 0.0d0  ! Initialize the coefficient matrix with zeros
+
             LEFT    = i-1
             RIGHT   = i+1
             BOTTOM  = j-1
@@ -159,85 +163,113 @@ program ht2d
 
             ! Internal Nodes
             if (LEFT /=0 .and. RIGHT/=Ni .and. TOP/=Nj+1 .and. BOTTOM/=0) then 
-                A(row,id(LEFT,j))   =  1
-                A(row,id(RIGHT,j))  =  1  
-                A(row,id(i,BOTTOM)) =  1  
-                A(row,id(i,TOP))    =  1 
-                A(row,id(i,j))      = -4   ! Center
-                b(row)              = -eGen*delta**2/k
+                A(id(LEFT,j))   =  1
+                A(id(RIGHT,j))  =  1  
+                A(id(i,BOTTOM)) =  1  
+                A(id(i,TOP))    =  1 
+                A(id(i,j))      = -4   ! Center
+                b(row)          = -eGen*delta**2/k
             end if
             
             ! Boundary Nodes
             ! Left
             if (LEFT == 0 .and. TOP /=Nj+1 .and. BOTTOM /= 0) then
-                A(row,id(RIGHT,j))  =  2  
-                A(row,id(i,BOTTOM)) =  1  
-                A(row,id(i,TOP))    =  1 
-                A(row,id(i,j))      = -4   ! Center
-                b(row)              = -eGen*delta**2/k - 2*qf*delta/k
+                A(id(RIGHT,j))  =  2  
+                A(id(i,BOTTOM)) =  1  
+                A(id(i,TOP))    =  1 
+                A(id(i,j))      = -4   ! Center
+                b(row)          = -eGen*delta**2/k - 2*qf*delta/k
             end if
             
             ! Right
             if (RIGHT == Ni .and. TOP /= Nj+1 .and. BOTTOM /= 0) then
-                A(row,id(LEFT,j))   =  1
-                A(row,id(i,BOTTOM)) =  1  
-                A(row,id(i,TOP))    =  1 
-                A(row,id(i,j))      = -4   ! Center
-                b(row)              = -eGen*delta**2/k -Tright
+                A(id(LEFT,j))   =  1
+                A(id(i,BOTTOM)) =  1  
+                A(id(i,TOP))    =  1 
+                A(id(i,j))      = -4   ! Center
+                b(row)          = -eGen*delta**2/k -Tright
             end if
             
             
             ! Top
             if (TOP == Nj + 1 .and. LEFT /=0 .and. RIGHT /=Ni) then
-                A(row,id(LEFT,j))   =  1
-                A(row,id(RIGHT,j))  =  1  
-                A(row,id(i,BOTTOM)) =  2
-                A(row,id(i,j))      = -4 - 2*delta*hT/k
-                b(row)              = -eGen*delta**2/k - 2*delta*hT/k*Tinf
+                A(id(LEFT,j))   =  1
+                A(id(RIGHT,j))  =  1  
+                A(id(i,BOTTOM)) =  2
+                A(id(i,j))      = -4 - 2*delta*hT/k
+                b(row)          = -eGen*delta**2/k - 2*delta*hT/k*Tinf
             end if
             
             ! Bottom
             if (BOTTOM == 0 .and. LEFT /=0 .and. RIGHT /=Ni) then
-                A(row,id(LEFT,j))   =  1
-                A(row,id(RIGHT,j))  =  1
-                A(row,id(i,TOP))    =  2
-                A(row,id(i,j))      = -4 - 2*delta*hB/k
-                b(row)              = -eGen*delta**2/k - 2*delta*hB/k*Tinf
+                A(id(LEFT,j))   =  1
+                A(id(RIGHT,j))  =  1
+                A(id(i,TOP))    =  2
+                A(id(i,j))      = -4 - 2*delta*hB/k
+                b(row)          = -eGen*delta**2/k - 2*delta*hB/k*Tinf
             end if
             
             ! Corner Nodes
             if (TOP == Nj+1 .and. LEFT == 0) then ! Top-Left
-                A(row,id(RIGHT,j))  =  2  
-                A(row,id(i,BOTTOM)) =  2   
-                A(row,id(i,j))      = -4 - 2*delta*hT/k;   ! Center
-                b(row)              = -eGen*delta**2/k - 2*qf*delta/k - 2*delta*hT/k*Tinf
+                A(id(RIGHT,j))  =  2  
+                A(id(i,BOTTOM)) =  2   
+                A(id(i,j))      = -4 - 2*delta*hT/k;   ! Center
+                b(row)          = -eGen*delta**2/k - 2*qf*delta/k - 2*delta*hT/k*Tinf
             end if
             
             if (TOP == Nj+1 .and. RIGHT == Ni) then ! Top-Right
-                A(row,id(LEFT,j))   =  1
-                A(row,id(i,BOTTOM)) =  2  
-                A(row,id(i,j))      = -4-2*delta*hT/k   ! Center
-                b(row)              = -eGen*delta**2/k - 2*delta*hT/k*Tinf - Tright
+                A(id(LEFT,j))   =  1
+                A(id(i,BOTTOM)) =  2  
+                A(id(i,j))      = -4-2*delta*hT/k   ! Center
+                b(row)          = -eGen*delta**2/k - 2*delta*hT/k*Tinf - Tright
             end if
             
             if (BOTTOM == 0 .and. LEFT == 0) then ! Bottom-Left
-                A(row,id(RIGHT,j))  =  2   
-                A(row,id(i,TOP))    =  2 
-                A(row,id(i,j))      = -4 - 2*delta*hB/k   ! Center
-                b(row)              = -eGen*delta**2/k - 2*qf*delta/k - 2*delta*hB/k*Tinf
+                A(id(RIGHT,j))  =  2   
+                A(id(i,TOP))    =  2 
+                A(id(i,j))      = -4 - 2*delta*hB/k   ! Center
+                b(row)          = -eGen*delta**2/k - 2*qf*delta/k - 2*delta*hB/k*Tinf
             end if
                  
             if (BOTTOM == 0 .and. RIGHT == Ni) then ! Bottom-Right
-                A(row,id(LEFT,j))   =  1
-                A(row,id(i,TOP))    =  2  
-                A(row,id(i,j))      = -4 - 2*delta*hB/k   ! Center
-                b(row)              = -eGen*delta**2/k - 2*delta*hB/k*Tinf - Tright
+                A(id(LEFT,j))   =  1
+                A(id(i,TOP))    =  2  
+                A(id(i,j))      = -4 - 2*delta*hB/k   ! Center
+                b(row)          = -eGen*delta**2/k - 2*delta*hB/k*Tinf - Tright
             end if
-                   
+                  
+            ! Inspect the row for non-zero elements               
+            flag = 0
+            do m = 1,N
+                if (abs(A(m)) > 1e-14) then
+                    if (flag == 0) then
+                        row_ptr(row) = NNZ - 1
+                        flag = 1
+                    end if
+                
+                    val(NNZ) = A(m)
+                    col_ind(NNZ) = m - 1
+                    NNZ = NNZ + 1
+                end if
+            end do
+
             row = row + 1 
         end do
     end do
-   
+    
+    ! Solve using the AMGX Solver
+    crs_data = (/N, NNZ-1, 1, 1/)
+    allocate(sol(N))
+    sol = 1
+    val = val
+    rhs = b
+
+    call cpu_time(start) 
+    ret = solveamg(c_loc(crs_data), c_loc(val), c_loc(col_ind), c_loc(row_ptr),c_loc(rhs),c_loc(sol))
+    call cpu_time(finish)
+    print *, 'Ni: ', Ni
+    print *, 'Nj: ', Nj
+    
     !open(unit=2, file='A.txt', ACTION="write", STATUS="replace")
     !do i=1,N
     !    write(2, '(*(F14.7))')( real(A(i,j)) ,j=1,N)
@@ -250,15 +282,15 @@ program ht2d
 
     print *, 'N: ', N
    
-    call cpu_time(start) 
-    call gauss_siedel(n,A,b,T)
-    call cpu_time(finish)
+    !call cpu_time(start) 
+    !call gauss_siedel(n,A,b,T)
+    !call cpu_time(finish)
 
     print '("Time: ",f6.3," seconds.")',finish-start
     
-    open(unit=11, file='T.txt', ACTION="write", STATUS="replace")
+    open(unit=11, file='T_AMGX.txt', ACTION="write", STATUS="replace")
     do i=1,N
-        write(11, '(*(F14.7))') real(T(i))
+        write(11, '(*(F14.7))') real(sol(i))
     end do
 end program ht2d
 
