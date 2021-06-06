@@ -7,7 +7,7 @@ module dataht
     real(8), parameter :: hT      = 70     ! Heat Transfer Coefficient, Top    [W/m^2/K]
     real(8), parameter :: hB      = 10     ! Heat Transfer Coefficient, Bottom [W/m^2/K]
     real(8), parameter :: Tinf    = 25     ! Ambient Temperature               [C]
-    real(8), parameter :: delta   = 0.1    ! Mesh Size                         [m]
+    real(8), parameter :: delta   = 0.01    ! Mesh Size                         [m]
     real(8), parameter :: qf      = 500    ! Heat Flux                         [W/m^2]
     real(8), parameter :: Tright  = 45     ! Right Boundary Temperature        [C]
     real(8), parameter :: Lx      = 1.5    ! X-Dimension of Plate              [m]
@@ -22,8 +22,9 @@ module dataht
     real(8), dimension(:,:), allocatable    :: b    ! RHS Vector
     real(8), dimension(:,:), allocatable    :: T    ! Unknown (Temperature Distribution)
     real(8), dimension(:,:), allocatable    :: TOUT ! Output
-    ! Declare Loop Indices variables 
+    real(8), dimension(:,:), allocatable    :: RES  ! Residual Matrix
 
+    ! Declare Loop Indices variables 
     integer(8) :: i, j, row
     integer(8) :: LEFT, RIGHT, UP, DOWN, CENTER
     
@@ -46,19 +47,21 @@ module dataht
         allocate(b(Ni,Nj))
         allocate(T(0:Ni+1,0:Nj+1))
         allocate(TOUT(Ni,Nj))
+        allocate(RES(Ni-1,Nj))
         
         ! Initialize  Matrices and Vectors
         A       = 0.0d0
         b       = 0.0d0
         T       = 0.0d0
+        RES     = 0.0d0
         TOUT    = 0.0d0
-        TOUT(Ni,:) = Tright 
+        TOUT(Ni,:) = Tright
 
     end subroutine
     
 end module dataht
 
-program ht2d
+program sparse_ht2d
     use dataht
     implicit none
    
@@ -68,7 +71,8 @@ program ht2d
     ! Define constants for Gauss-Seidel(SOR)
     real, parameter     :: OMEGA        = 1.8
     real, parameter     :: TOLERANCE    = 1E-10
-    integer, parameter  :: MAXITER      = 10000
+    integer, parameter  :: MAXITER      = 1E6
+    real(8)             :: ERROR
     integer             :: ITER
     real(8)             :: TTEMP
     
@@ -167,8 +171,12 @@ program ht2d
     end do
     
     ! Gauss-Seidel Method (Succesive Over-Relaxation)
-    ITER = 1
-    do while ((ITER < MAXITER)) !.and.(resnorm > TOLERANCE))
+    ITER  = 1
+    ERROR = 1.0d0
+    
+    call cpu_time(start) 
+    do while ((ITER < MAXITER) .and.(ERROR > TOLERANCE))
+        ! Solve for T
         do j = 1,Nj
             do i = 1,Ni-1
 
@@ -179,33 +187,44 @@ program ht2d
 
                 ! Multiply the coefficients with the corresponding temperature
                 ! value and the source terms
-                   TTemp  =               b(i,j)    - &
-                            (A(i,j,L) * T(LEFT,j)   + &
-                             A(i,j,R) * T(RIGHT,j)  + &
-                             A(i,j,U) * T(i,UP)     + &
-                             A(i,j,D) * T(i,DOWN))
-                   TTemp = TTemp/A(i,j,C)
+                TTemp  =               b(i,j)    - &
+                         (A(i,j,L) * T(LEFT,j)   + &
+                          A(i,j,R) * T(RIGHT,j)  + &
+                          A(i,j,U) * T(i,UP)     + &
+                          A(i,j,D) * T(i,DOWN))
+                TTemp = TTemp/A(i,j,C)
                 T(i,j) = (1-OMEGA)*T(i,j) + OMEGA*TTemp
              end do
           end do
+
+        ! Calculate Residual
+        do j = 1,Nj
+            do i = 1,Ni-1
+
+                LEFT    = i-1
+                RIGHT   = i+1
+                DOWN    = j-1
+                UP      = j+1
+
+                RES(i,j)  = A(i,j,L) * T(LEFT,j)   + &
+                            A(i,j,R) * T(RIGHT,j)  + &
+                            A(i,j,U) * T(i,UP)     + &
+                            A(i,j,D) * T(i,DOWN)   + &
+                            A(i,j,C) * T(i,j)   - &
+                            b(i,j)
+             end do
+          end do
+        
+          ERROR = norm2(RES)
+        
          ITER = ITER + 1
      end do
-  print *,'iter = ', iter 
-    !open(unit=2, file='A.txt', ACTION="write", STATUS="replace")
-    !do i=1,N
-    !    write(2, '(*(F14.7))')( real(A(i,j)) ,j=1,N)
-    !end do
-    
-    !open(unit=3, file='b.txt', ACTION="write", STATUS="replace")
-    !do i=1,N
-    !    write(3, '(*(F14.7))') real(b(i))
-    !end do
+    call cpu_time(finish)
 
-    !call cpu_time(start) 
-    !call gauss_siedel(n,A,b,T)
-    !call cpu_time(finish)
+    print *,'iter = ', iter 
+    print *, 'ERROR = ', ERROR
 
-    !print '("Time: ",f6.3," seconds.")',finish-start
+    print '("Time: ",f10.5," seconds.")',finish-start
    
     print *,'Ni = ', Ni 
     print *,'Nj = ', Nj 
@@ -217,5 +236,5 @@ program ht2d
         write(11, '(*(F14.7))') (real(TOUT(i,j)), i=1,Ni)
     end do
 
-end program ht2d
+end program sparse_ht2d
 
