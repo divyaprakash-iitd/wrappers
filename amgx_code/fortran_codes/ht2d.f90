@@ -22,7 +22,8 @@ module dataht
     real(8), dimension(:,:), allocatable    :: A    ! Coefficient Matrix
     real(8), dimension(:), allocatable      :: b    ! RHS Vector
     real(8), dimension(:), allocatable      :: T    ! Unknown (Temperature Distribution)
-
+    real(8), dimension(:,:), allocatable    :: TOUT ! Output
+    
     ! Declare Loop Indices variables 
     integer(8) :: i, j, row
     integer(8) :: LEFT, RIGHT, TOP, BOTTOM, CENTER
@@ -46,11 +47,14 @@ module dataht
         allocate(A(N,N))
         allocate(b(N))
         allocate(T(N))
+        allocate(TOUT(Ni,Nj))
         
         ! Initialize  Matrices and Vectors
-        A = 0.0d0
-        b = 0.0d0
-        T = 0.0d0
+        A       = 0.0d0
+        b       = 0.0d0
+        T       = 0.0d0
+        TOUT    = 0.0d0
+        TOUT(Ni,:) = Tright 
     end subroutine
     
     subroutine gauss_siedel(n,A,b,T)
@@ -71,10 +75,11 @@ module dataht
         error   = 1.0
         tol     = 1e-10
         w       = 1.8     ! Relaxation Factor 
-        maxIter = 10000
-        iter    = 0
+        maxIter = 200
+        iter    = 1
 
-        do while ((error > tol).and.(iter < maxIter))
+        do while (iter < maxIter)
+        !do while ((error > tol).and.(iter < maxIter))
             xold = T
             do i = 1,n
                 ! Calculate S
@@ -227,10 +232,15 @@ program ht2d
     call cpu_time(finish)
 
     print '("Time: ",f6.3," seconds.")',finish-start
+       
+    TOUT(1:Ni-1,:) = reshape(T,(/Ni-1, Nj/))
+    open(unit=11, file='T_GS.txt', ACTION="write", STATUS="replace")
     
-    open(unit=11, file='T.txt', ACTION="write", STATUS="replace")
-    do i=1,N
-        write(11, '(*(F14.7))') real(T(i))
+    do j=1,Nj
+        write(11, '(*(F14.7))') (real(TOUT(i,j)), i=1,Ni)
     end do
+
+    print *,'Ni = ', Ni
+    print *,'Nj = ', Nj
 end program ht2d
 
