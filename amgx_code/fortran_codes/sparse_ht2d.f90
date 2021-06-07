@@ -219,7 +219,7 @@ program sparse_ht2d
           end do
         
           RESV = reshape(RES,(/Ni-1*Nj/))
-          ERROR = norm2(abs(RESV))
+          ERROR = norm2(abs(RESV))/(Ni-1)/Nj
         
          ITER = ITER + 1
      end do
