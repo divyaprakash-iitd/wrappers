@@ -23,6 +23,7 @@ module dataht
     real(8), dimension(:,:), allocatable    :: T    ! Unknown (Temperature Distribution)
     real(8), dimension(:,:), allocatable    :: TOUT ! Output
     real(8), dimension(:,:), allocatable    :: RES  ! Residual Matrix
+    real(8), dimension(:), allocatable      :: RESV ! Residual Vector
 
     ! Declare Loop Indices variables 
     integer(8) :: i, j, row
@@ -48,6 +49,7 @@ module dataht
         allocate(T(0:Ni+1,0:Nj+1))
         allocate(TOUT(Ni,Nj))
         allocate(RES(Ni-1,Nj))
+        allocate(RESV((Ni-1)*Nj))
         
         ! Initialize  Matrices and Vectors
         A       = 0.0d0
@@ -56,6 +58,7 @@ module dataht
         RES     = 0.0d0
         TOUT    = 0.0d0
         TOUT(Ni,:) = Tright
+        RESV = 0.d0
 
     end subroutine
     
@@ -71,7 +74,7 @@ program sparse_ht2d
     ! Define constants for Gauss-Seidel(SOR)
     real, parameter     :: OMEGA        = 1.8
     real, parameter     :: TOLERANCE    = 1E-10
-    integer, parameter  :: MAXITER      = 1E6
+    integer, parameter  :: MAXITER      = 1E4
     real(8)             :: ERROR
     integer             :: ITER
     real(8)             :: TTEMP
@@ -215,7 +218,8 @@ program sparse_ht2d
              end do
           end do
         
-          ERROR = norm2(RES)
+          RESV = reshape(RES,(/Ni-1*Nj/))
+          ERROR = norm2(abs(RESV))
         
          ITER = ITER + 1
      end do
