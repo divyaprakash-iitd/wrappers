@@ -1,8 +1,10 @@
+#define MAX_MSG_LEN 4096
+
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
 #include "amgaxb_headers.h"
-#include "amgx_c.h"
+#include <amgx_c.h>
 
 //#include "cuda_runtime.h" 
 /* CUDA error macro */
@@ -92,13 +94,19 @@ int solveamg(int *crs_data, double *data, int *col_ind, int *row_ptr, double *rh
 
     /* Specify configuration */
     //AMGX_SAFE_CALL(AMGX_config_create(&cfg, "config_version=2, solver(amg_solver)=AMG"));
-    AMGX_SAFE_CALL(AMGX_config_create(&cfg, "config_version=2, solver(amg_solver)=AMG,print_solve_stats=1,print_grid_stats=1,max_iters=1e6,tolerance=1e-10,norm=L2,monitor_residual=1,print_solve_stats=1")); 
+    AMGX_SAFE_CALL(AMGX_config_create(&cfg, "config_version=2, solver(amg_solver)=AMG, amg_solver:print_solve_stats=1,amg_solver: monitor_residual=1, amg_solver:max_iters=10000, amg_solver:tolerance=0.000000001, amg_solver:norm=L2, amg_solver:store_res_history=1")); 
     //AMGX_SAFE_CALL(AMGX_config_create(&cfg, "config_version= 2, use_scalar_norm= 1,solver= BLOCK_JACOBI,print_solve_stats= 1, obtain_timings= 1,monitor_residual= 1, convergence= RELATIVE_INI_CORE, tolerance= 1e-14, norm= L2,max_iters=10000"));
 
    //AMGX_SAFE_CALL(AMGX_config_create(&cfg, "config_version= 2, determinism_flag= 1, print_grid_stats= 1, max_uncolored_percentage= 0.15, algorithm= AGGREGATION, obtain_timings= 1, solver= AMG, smoother= MULTICOLOR_GS, print_solve_stats= 1, presweeps= 1, symmetric_GS= 1, selector= SIZE_2, coarsest_sweeps= 2, max_iters= 1000, monitor_residual= 1, postsweeps= 1, max_levels= 1000, matrix_coloring_scheme= MIN_MAX, tolerance= 0.1, norm= L1, cycle= V"));
 
   //AMGX_SAFE_CALL(AMGX_config_create(&cfg, "config_version= 2, solver= AMG, smoother= MULTICOLOR_GS, max_iters= 1000, tolerance= 1e-6, norm= L2"));
     
+    //AMGX_SAFE_CALL(AMGX_config_create(&cfg, "config_version=2, convergence=ABSOLUTE, max_iters=1e6, monitor_residual=1, norm=L2, solver(my_solver)=AMG, tolerance=1e-10, print_solve_stats=1, print_grid_stats=1,")); 
+
+
+    //AMGX_SAFE_CALL(AMGX_config_create(&cfg,"config_version=2,solver=FGMRES,gmres_n_restart=20,max_iters=100,norm=L2,convergence=RELATIVE_INI_CORE,monitor_residual=1,tolerance=1e-4,preconditioner(amg_solver)=AMG,amg_solver:algorithm=CLASSICAL,amg_solver:max_iters=2,amg_solver:presweeps=1,amg_solver:postsweeps=1,amg_solver:cycle=V,print_solve_stats=1,print_grid_stats=1,obtain_timings=1"));
+
+   //AMGX_SAFE_CALL(AMGX_config_create(&cfg,"config_version=2, preconditioner(my_solver)=AMG, my_solver:error_scaling= 0, my_solver:print_grid_stats=1, my_solver:max_uncolored_percentage=0.05, my_solver:algorithm=AGGREGATION,  my_solver:smoother=MULTICOLOR_DILU, my_solver:presweeps=0, my_solver:selector=SIZE_2, my_solver:coarse_solver=DENSE_LU_SOLVER, my_solver:max_iters=1, my_solver:postsweeps=3, my_solver:min_coarse_rows=32, my_solver:relaxation_factor=0.75, my_solver:max_levels=100, my_solver:matrix_coloring_scheme=PARALLEL_GREEDY, my_solver:cycle= V, use_scalar_norm=1, solver=FGMRES, my_solver:print_solve_stats=1, obtain_timings=1, max_iters=100, my_solver:monitor_residual=1, gmres_n_restart=10, convergence=RELATIVE_INI_CORE, tolerance=1e-10, norm=L2"));
     /* create resources, matrix, vector and solver */
     AMGX_resources_create_simple(&rsrc, cfg);
     AMGX_matrix_create(&A, rsrc, mode);
@@ -147,8 +155,20 @@ int solveamg(int *crs_data, double *data, int *col_ind, int *row_ptr, double *rh
     
     //AMGX_solver_solve(solver, b, x);
     AMGX_solver_get_status(solver, &status);
+    /* example of how to print the residual history */
+    //int nit;
+    //double res;
+    //AMGX_solver_get_iterations_number(solver, &nit);
+    //for (int i=0; i<nit; i++) {
+    //  printf("residual from iteration %d=", i);
+    //  for (int j=0; j<bsize_y; j++) {
+    //    AMGX_solver_get_iteration_residual(solver, i, j, &res);
+    //    printf("%f ", (float)(res));
+    //  }
+    //  printf("\n");
+    //}
+
     /* example of how to write the linear system to the output */
-    
     AMGX_vector_download(x,sol);
     //AMGX_write_system(A, b, x, "output.system.mtx");
     /* destroy resources, matrix, vector and solver */
