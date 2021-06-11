@@ -7,7 +7,7 @@ module dataht
     real(8), parameter :: hT      = 70     ! Heat Transfer Coefficient, Top    [W/m^2/K]
     real(8), parameter :: hB      = 10     ! Heat Transfer Coefficient, Bottom [W/m^2/K]
     real(8), parameter :: Tinf    = 25     ! Ambient Temperature               [C]
-    real(8), parameter :: delta   = 0.05    ! Mesh Size                         [m]
+    real(8), parameter :: delta   = 0.1    ! Mesh Size                         [m]
     real(8), parameter :: qf      = 500    ! Heat Flux                         [W/m^2]
     real(8), parameter :: Tright  = 45     ! Right Boundary Temperature        [C]
     real(8), parameter :: Lx      = 1.5    ! X-Dimension of Plate              [m]
@@ -32,9 +32,9 @@ module dataht
     !integer(8) :: id
    
     ! Variables to run the gs_sor subroutine
-    real(8) :: eps   = 1e-6
-    real(8) :: omega = 0.9
-    integer, parameter :: iter  = 1000
+    real(8) :: eps   = 1e-10
+    real(8) :: omega = 1.8
+    integer, parameter :: iter  = 1e6
     
     contains
     subroutine init() 
@@ -75,7 +75,7 @@ module dataht
         error   = 1.0
         tol     = 1e-10
         w       = 1.8     ! Relaxation Factor 
-        maxIter = 200
+        maxIter = 1e6
         iter    = 1
 
         do while (iter < maxIter)

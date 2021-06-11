@@ -5,20 +5,20 @@ k       = 2;
 hT      = 70;
 hB      = 10;
 Tinf    = 25;
-delta   = 10e-2 ;
+delta   = 0.25;
 qf      = 500;
 Tright  = 45;
 
 Lx = 1.5;
 Ly = 1;
 
-Ni = Lx/delta + 1; 
-Nj = Ly/delta + 1;
+Ni = ceil(Lx/delta) + 1; 
+Nj = ceil(Ly/delta) + 1;
 
 N = (Ni-1)*(Nj); % Because of right boundary
 
-A = zeros(N,N);
-b = zeros(N,1);
+A = sparse(zeros(N,N));
+b = sparse(zeros(N,1));
 
 id = @(i,j) (j-1)*(Ni-1)+i;
 

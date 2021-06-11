@@ -7,7 +7,7 @@ module dataht
     real(8), parameter :: hT      = 70     ! Heat Transfer Coefficient, Top    [W/m^2/K]
     real(8), parameter :: hB      = 10     ! Heat Transfer Coefficient, Bottom [W/m^2/K]
     real(8), parameter :: Tinf    = 25     ! Ambient Temperature               [C]
-    real(8), parameter :: delta   = 0.01    ! Mesh Size                         [m]
+    real(8), parameter :: delta   = 0.005    ! Mesh Size                         [m]
     real(8), parameter :: qf      = 500    ! Heat Flux                         [W/m^2]
     real(8), parameter :: Tright  = 45     ! Right Boundary Temperature        [C]
     real(8), parameter :: Lx      = 1.5    ! X-Dimension of Plate              [m]
@@ -72,9 +72,9 @@ program sparse_ht2d
     real :: start, finish
     
     ! Define constants for Gauss-Seidel(SOR)
-    real, parameter     :: OMEGA        = 1.8
+    real, parameter     :: OMEGA        = 1.99
     real, parameter     :: TOLERANCE    = 1E-10
-    integer, parameter  :: MAXITER      = 1E4
+    integer, parameter  :: MAXITER      = 1E6
     real(8)             :: ERROR
     integer             :: ITER
     real(8)             :: TTEMP

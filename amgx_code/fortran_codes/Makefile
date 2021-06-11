@@ -1,15 +1,18 @@
 FORT= gfortran
+LIB_D = -L/home/divyaprakash/my_projects/fortarn_c_wrapper/amgx_code/heat_transfer_lib
+LIB_L = -lht
 
-OBJECTS=dataht.o ht2d.o
 
-ht2d: $(OBJECTS) 
-	$(FORT) -o $@ $(OBJECTS)
+OBJECTS=ftn_c.o amgx_ht2d.o
 
-dataht.o: dataht.f90 Makefile
+amgx_ht2d: $(OBJECTS) 
+	$(FORT) -o $@ $(OBJECTS) $(LIB_D) $(LIB_L)
+
+ftn_c.o: ftn_c.f90 Makefile
 	$(FORT) -c $<
 
-ht2d.o: ht2d.f90 Makefile
+amgx_ht2d.o: amgx_ht2d.f90 Makefile
 	$(FORT) -c $<
 
 clean:
-	rm -f ht1dn *.mod *.bak *~ $(OBJECTS) 
+	rm -f amgx_ht2d *.mod *.bak *~ $(OBJECTS) 
