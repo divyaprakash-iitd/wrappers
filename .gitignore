@@ -30,3 +30,7 @@
 *.exe
 *.out
 *.app
+
+# Test codes
+/home/divyaprakash/my_projects/fortarn_c_wrapper/amgx_code/fortran_codes/*
+/home/divyaprakash/my_projects/fortarn_c_wrapper/amgx_code/matlab_codes/*

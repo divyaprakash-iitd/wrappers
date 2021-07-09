@@ -5,7 +5,7 @@ k       = 2;
 hT      = 70;
 hB      = 10;
 Tinf    = 25;
-delta   = 0.25;
+delta   = 0.05;
 qf      = 500;
 Tright  = 45;
 

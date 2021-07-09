@@ -109,6 +109,7 @@ module dataht
 end module dataht
 
 program ht2d
+    use nvtx
     use dataht
    
     !------------Fortran to C interface-------------!
@@ -140,6 +141,8 @@ program ht2d
     ! Miscellaneous Variables
     integer :: ret ! Stores the return value of AMGX function
  
+    call nvtxStartRange("Initialize data and variables")
+    
     ! Initialize variables
     call init()
     
@@ -267,6 +270,8 @@ program ht2d
     sol = 1
     rhs = b
 
+    call nvtxEndRange
+    
     call cpu_time(start) 
     ret = solveamg(c_loc(crs_data), c_loc(val), c_loc(col_ind), c_loc(row_ptr),c_loc(rhs),c_loc(sol))
     call cpu_time(finish)
