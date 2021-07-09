@@ -38,6 +38,13 @@ void print_callback(const char *msg, int length)
 }
 
 
+//input matrix and rhs/solution
+int n;
+int bsize_x;
+int bsize_y;
+int sol_size;
+int sol_bsize;
+
 //int main(int argc, const char **argv)
 int solveamg(int *crs_data, double *data, int *col_ind, int *row_ptr, double *rhs, double *sol) 
 {
@@ -50,11 +57,11 @@ int solveamg(int *crs_data, double *data, int *col_ind, int *row_ptr, double *rh
     //printf("The size of sol is: %d\n", sizeof(sol));
     
     //input matrix and rhs/solution
-    int n = 0;
-    int bsize_x = 0;
-    int bsize_y = 0;
-    int sol_size = 0;
-    int sol_bsize = 0;
+    n = 0;
+    bsize_x = 0;
+    bsize_y = 0;
+    sol_size = 0;
+    sol_bsize = 0;
     //library handles
     AMGX_Mode mode;
     AMGX_config_handle cfg;
