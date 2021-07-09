@@ -45,6 +45,16 @@ int bsize_y;
 int sol_size;
 int sol_bsize;
 
+//library handles
+AMGX_Mode mode;
+AMGX_config_handle cfg;
+AMGX_resources_handle rsrc;
+AMGX_matrix_handle A;
+AMGX_vector_handle b, x;
+AMGX_solver_handle solver;
+//status handling
+AMGX_SOLVE_STATUS status;
+
 //int main(int argc, const char **argv)
 int solveamg(int *crs_data, double *data, int *col_ind, int *row_ptr, double *rhs, double *sol) 
 {
@@ -62,15 +72,6 @@ int solveamg(int *crs_data, double *data, int *col_ind, int *row_ptr, double *rh
     bsize_y = 0;
     sol_size = 0;
     sol_bsize = 0;
-    //library handles
-    AMGX_Mode mode;
-    AMGX_config_handle cfg;
-    AMGX_resources_handle rsrc;
-    AMGX_matrix_handle A;
-    AMGX_vector_handle b, x;
-    AMGX_solver_handle solver;
-    //status handling
-    AMGX_SOLVE_STATUS status;
 
 
     /* load the library (if it was dynamically loaded) */
