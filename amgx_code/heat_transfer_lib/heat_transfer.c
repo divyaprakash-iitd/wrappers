@@ -37,7 +37,7 @@ void print_callback(const char *msg, int length)
     printf("%s", msg);
 }
 
-
+// GLOBAL VARIABLES
 //input matrix and rhs/solution
 int n;
 int bsize_x;
@@ -56,7 +56,7 @@ AMGX_solver_handle solver;
 AMGX_SOLVE_STATUS status;
 
 //int main(int argc, const char **argv)
-int solveamg(int *crs_data, double *data, int *col_ind, int *row_ptr, double *rhs, double *sol) 
+int initialize_amgx(int *crs_data, double *data, int *col_ind, int *row_ptr, double *rhs, double *sol) 
 {
     
     //printf("The size of crs_data : %d\n", sizeof(crs_data));
@@ -188,6 +188,47 @@ int solveamg(int *crs_data, double *data, int *col_ind, int *row_ptr, double *rh
     /* example of how to write the linear system to the output */
     AMGX_vector_download(x,sol);
     //AMGX_write_system(A, b, x, "output.system.mtx");
+    /* destroy resources, matrix, vector and solver */
+    //AMGX_solver_destroy(solver);
+    //AMGX_vector_destroy(x);
+    //AMGX_vector_destroy(b);
+    //AMGX_matrix_destroy(A);
+    //AMGX_resources_destroy(rsrc);
+    /* destroy config (need to use AMGX_SAFE_CALL after this point) */
+    //AMGX_SAFE_CALL(AMGX_config_destroy(cfg));
+    /* shutdown and exit */
+    //AMGX_SAFE_CALL(AMGX_finalize_plugins());
+    //AMGX_SAFE_CALL(AMGX_finalize());
+    /* close the library (if it was dynamically loaded) */
+#ifdef AMGX_DYNAMIC_LOADING
+    //amgx_libclose(lib_handle);
+#endif
+    //CUDA_SAFE_CALL(cudaDeviceReset());
+    //return status;
+}
+
+int solveamg(int *crs_data, double *rhs, double *sol) 
+{
+    AMGX_vector_upload(b, crs_data[0], 1, rhs);
+    
+    AMGX_vector_get_size(x, &sol_size, &sol_bsize);
+    /* Input your initial guess, x */
+    AMGX_vector_set_zero(x, n, bsize_x);
+
+
+    /* solver setup */
+    //AMGX_solver_setup(solver, A);
+    /* solver solve */
+    AMGX_solver_solve(solver, b, x);
+    AMGX_solver_get_status(solver, &status);
+
+    /* example of how to write the linear system to the output */
+    AMGX_vector_download(x,sol);
+}
+
+
+int destroy_amgx() 
+{
     /* destroy resources, matrix, vector and solver */
     AMGX_solver_destroy(solver);
     AMGX_vector_destroy(x);
