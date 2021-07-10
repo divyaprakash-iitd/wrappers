@@ -94,8 +94,8 @@ int solveamg(int *crs_data, double *data, int *col_ind, int *row_ptr, double *rh
 
     /* Specify configuration */
     //AMGX_SAFE_CALL(AMGX_config_create(&cfg, "config_version=2, solver(amg_solver)=AMG"));
-    //AMGX_SAFE_CALL(AMGX_config_create(&cfg, "config_version=2, solver(amg_solver)=AMG, amg_solver:print_solve_stats=0,amg_solver: monitor_residual=1, amg_solver:max_iters=1000000, amg_solver:tolerance=0.00000000000001, amg_solver:norm=L2, amg_solver:store_res_history=0, amg_solver:obtain_timings=0"));
-    AMGX_SAFE_CALL(AMGX_config_create(&cfg, "config_version=2, solver(amg_solver)=AMG, amg_solver:print_solve_stats=1,amg_solver: monitor_residual=1, amg_solver:max_iters=1000000, amg_solver:tolerance=0.0000000001, amg_solver:norm=L2, amg_solver:store_res_history=1, amg_solver:obtain_timings=1")); 
+    AMGX_SAFE_CALL(AMGX_config_create(&cfg, "config_version=2, solver(amg_solver)=AMG, amg_solver:print_solve_stats=0,amg_solver: monitor_residual=1, amg_solver:max_iters=1000000, amg_solver:tolerance=0.00000000000001, amg_solver:norm=L2, amg_solver:store_res_history=0, amg_solver:obtain_timings=0"));
+    //AMGX_SAFE_CALL(AMGX_config_create(&cfg, "config_version=2, solver(amg_solver)=AMG, amg_solver:print_solve_stats=1,amg_solver: monitor_residual=1, amg_solver:max_iters=1000000, amg_solver:tolerance=0.0000000001, amg_solver:norm=L2, amg_solver:store_res_history=1, amg_solver:obtain_timings=1")); 
     //AMGX_SAFE_CALL(AMGX_config_create(&cfg, "config_version= 2, use_scalar_norm= 1,solver= BLOCK_JACOBI,print_solve_stats= 1, obtain_timings= 1,monitor_residual= 1, convergence= RELATIVE_INI_CORE, tolerance= 1e-14, norm= L2,max_iters=10000"));
 
    //AMGX_SAFE_CALL(AMGX_config_create(&cfg, "config_version= 2, determinism_flag= 1, print_grid_stats= 1, max_uncolored_percentage= 0.15, algorithm= AGGREGATION, obtain_timings= 1, solver= AMG, smoother= MULTICOLOR_GS, print_solve_stats= 1, presweeps= 1, symmetric_GS= 1, selector= SIZE_2, coarsest_sweeps= 2, max_iters= 1000, monitor_residual= 1, postsweeps= 1, max_levels= 1000, matrix_coloring_scheme= MIN_MAX, tolerance= 0.1, norm= L1, cycle= V"));

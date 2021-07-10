@@ -1,6 +1,6 @@
 # CUDA Toolkit location
-INC_D = -I/usr/local/cuda/include -I/home/divyaprakash/AMGX/base/include
-LIB_D = -L/usr/local/cuda/lib64 -L/home/divyaprakash/AMGX/build
+INC_D = -I/usr/local/cuda/include -I/home/am/phd/amz208461/AMGX/base/include
+LIB_D = -L/usr/local/cuda/lib64 -L/home/am/phd/amz208461/AMGX/build
 LIB_L = -lcusparse -lcublas -lcudart -ldl -lamgxsh
 
 heat_transfer:
