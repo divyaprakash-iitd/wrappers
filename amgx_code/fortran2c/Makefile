@@ -1,5 +1,5 @@
 FORT= gfortran
-LIB_D = -L/home/divyaprakash/my_projects/fortarn_c_wrapper/amgx_code/heat_transfer_lib
+LIB_D = -L/home/am/phd/amz208461/my_projects/wrappers/amgx_code/heat_transfer_lib
 LIB_L = -lht
 
 
