@@ -37,25 +37,41 @@ void print_callback(const char *msg, int length)
     printf("%s", msg);
 }
 
+// GLOBAL VARIABLES
+//input matrix and rhs/solution
+int n;
+int bsize_x;
+int bsize_y;
+int sol_size;
+int sol_bsize;
+
+//library handles
+AMGX_Mode mode;
+AMGX_config_handle cfg;
+AMGX_resources_handle rsrc;
+AMGX_matrix_handle A;
+AMGX_vector_handle b, x;
+AMGX_solver_handle solver;
+//status handling
+AMGX_SOLVE_STATUS status;
 
 //int main(int argc, const char **argv)
-int solveamg(int *crs_data, double *data, int *col_ind, int *row_ptr, double *rhs, double *sol) 
+int initialize_amgx(int *crs_data, double *data, int *col_ind, int *row_ptr, double *rhs, double *sol) 
 {
+    
+    //printf("The size of crs_data : %d\n", sizeof(crs_data));
+    //printf("The size of val is: %d\n", sizeof(data));
+    //printf("The size of col_ind is: %d\n", sizeof(col_ind));
+    //printf("The size of row_ptr is: %d\n", sizeof(row_ptr));
+    //printf("The size of rhs is: %d\n", sizeof(rhs));
+    //printf("The size of sol is: %d\n", sizeof(sol));
+    
     //input matrix and rhs/solution
-    int n = 0;
-    int bsize_x = 0;
-    int bsize_y = 0;
-    int sol_size = 0;
-    int sol_bsize = 0;
-    //library handles
-    AMGX_Mode mode;
-    AMGX_config_handle cfg;
-    AMGX_resources_handle rsrc;
-    AMGX_matrix_handle A;
-    AMGX_vector_handle b, x;
-    AMGX_solver_handle solver;
-    //status handling
-    AMGX_SOLVE_STATUS status;
+    n = 0;
+    bsize_x = 0;
+    bsize_y = 0;
+    sol_size = 0;
+    sol_bsize = 0;
 
 
     /* load the library (if it was dynamically loaded) */
@@ -172,6 +188,47 @@ int solveamg(int *crs_data, double *data, int *col_ind, int *row_ptr, double *rh
     /* example of how to write the linear system to the output */
     AMGX_vector_download(x,sol);
     //AMGX_write_system(A, b, x, "output.system.mtx");
+    /* destroy resources, matrix, vector and solver */
+    //AMGX_solver_destroy(solver);
+    //AMGX_vector_destroy(x);
+    //AMGX_vector_destroy(b);
+    //AMGX_matrix_destroy(A);
+    //AMGX_resources_destroy(rsrc);
+    /* destroy config (need to use AMGX_SAFE_CALL after this point) */
+    //AMGX_SAFE_CALL(AMGX_config_destroy(cfg));
+    /* shutdown and exit */
+    //AMGX_SAFE_CALL(AMGX_finalize_plugins());
+    //AMGX_SAFE_CALL(AMGX_finalize());
+    /* close the library (if it was dynamically loaded) */
+#ifdef AMGX_DYNAMIC_LOADING
+    //amgx_libclose(lib_handle);
+#endif
+    //CUDA_SAFE_CALL(cudaDeviceReset());
+    //return status;
+}
+
+int solveamg(int *crs_data, double *rhs, double *sol) 
+{
+    AMGX_vector_upload(b, crs_data[0], 1, rhs);
+    
+    AMGX_vector_get_size(x, &sol_size, &sol_bsize);
+    /* Input your initial guess, x */
+    AMGX_vector_set_zero(x, n, bsize_x);
+
+
+    /* solver setup */
+    //AMGX_solver_setup(solver, A);
+    /* solver solve */
+    AMGX_solver_solve(solver, b, x);
+    AMGX_solver_get_status(solver, &status);
+
+    /* example of how to write the linear system to the output */
+    AMGX_vector_download(x,sol);
+}
+
+
+int destroy_amgx() 
+{
     /* destroy resources, matrix, vector and solver */
     AMGX_solver_destroy(solver);
     AMGX_vector_destroy(x);
