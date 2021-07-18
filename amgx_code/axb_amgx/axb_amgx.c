@@ -44,6 +44,7 @@ int bsize_x;
 int bsize_y;
 int sol_size;
 int sol_bsize;
+int N; int nnz; int block_dimx; int block_dimy;
 
 //library handles
 AMGX_Mode mode;
@@ -145,7 +146,7 @@ int initialize_amgx(int *crs_data, double *data, int *col_ind, int *row_ptr, dou
 
     // int N = 4; int nnz = 10; int block_dimx = 1; int block_dimy = 1;
     
-    int N; int nnz; int block_dimx; int block_dimy;
+    // int N; int nnz; int block_dimx; int block_dimy;
     N = crs_data[0]; nnz = crs_data[1]; block_dimx = crs_data[2]; block_dimy = crs_data[3];
     
     AMGX_matrix_upload_all(A, N, nnz, block_dimx, block_dimy, row_ptr, col_ind, data, 0);
@@ -156,7 +157,7 @@ int initialize_amgx(int *crs_data, double *data, int *col_ind, int *row_ptr, dou
     /* Input your RHS vector */
     //double rhs[] = {-300, 0, 0, -100};
     //AMGX_pin_memory(rhs);
-    AMGX_vector_upload(b, crs_data[0], 1, rhs);
+    AMGX_vector_upload(b, N, 1, rhs);
     
     AMGX_vector_get_size(x, &sol_size, &sol_bsize);
     /* Input your initial guess, x */
@@ -207,11 +208,11 @@ int initialize_amgx(int *crs_data, double *data, int *col_ind, int *row_ptr, dou
     //return status;
 }
 
-int solveamg(int *crs_data, double *rhs, double *sol) 
+int solveamg(double *rhs, double *sol) 
 {
-    AMGX_vector_upload(b, crs_data[0], 1, rhs);
+    AMGX_vector_upload(b, N, 1, rhs);
     
-    AMGX_vector_get_size(x, &sol_size, &sol_bsize);
+    // AMGX_vector_get_size(x, &sol_size, &sol_bsize);
     /* Input your initial guess, x */
     AMGX_vector_set_zero(x, n, bsize_x);
 
