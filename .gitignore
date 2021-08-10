@@ -35,3 +35,6 @@
 *.qdrep
 *.sqlite
 *.txt
+
+# Makefile
+Makefile
