@@ -110,8 +110,27 @@ int initialize_amgx(int *crs_data, double *data, int *col_ind, int *row_ptr, dou
     mode = AMGX_mode_dDDI;
 
     /* Specify configuration */
+    AMGX_SAFE_CALL(AMGX_config_create(&cfg,
+    "config_version=2,\
+    solver=FGMRES,\
+    gmres_n_restart=20,\
+    max_iters=10000,\
+    norm=L2,\
+    convergence=RELATIVE_INI_CORE,\
+    monitor_residual=1,\
+    tolerance=1e-4,\
+    preconditioner(amg_solver)=AMG,\
+    amg_solver:algorithm=CLASSICAL,\
+    amg_solver:max_iters=2,\
+    amg_solver:presweeps=1,\
+    amg_solver:postsweeps=1,\
+    amg_solver:cycle=V,\
+    print_solve_stats=0,\
+    print_grid_stats=0,\
+    obtain_timings=0"));
+
     //AMGX_SAFE_CALL(AMGX_config_create(&cfg, "config_version=2, solver(amg_solver)=AMG"));
-    AMGX_SAFE_CALL(AMGX_config_create(&cfg, "config_version=2, solver(amg_solver)=AMG, amg_solver:print_solve_stats=0,amg_solver: monitor_residual=1, amg_solver:max_iters=1000000, amg_solver:tolerance=0.00000000000001, amg_solver:norm=L2, amg_solver:store_res_history=0, amg_solver:obtain_timings=0"));
+    //AMGX_SAFE_CALL(AMGX_config_create(&cfg, "config_version=2, solver(amg_solver)=AMG, amg_solver:print_solve_stats=0,amg_solver: monitor_residual=1, amg_solver:max_iters=1000000, amg_solver:tolerance=0.00000000000001, amg_solver:norm=L2, amg_solver:store_res_history=0, amg_solver:obtain_timings=0"));
     //AMGX_SAFE_CALL(AMGX_config_create(&cfg, "config_version=2, solver(amg_solver)=AMG, amg_solver:print_solve_stats=1,amg_solver: monitor_residual=1, amg_solver:max_iters=1000000, amg_solver:tolerance=0.0000000001, amg_solver:norm=L2, amg_solver:store_res_history=1, amg_solver:obtain_timings=1")); 
     //AMGX_SAFE_CALL(AMGX_config_create(&cfg, "config_version= 2, use_scalar_norm= 1,solver= BLOCK_JACOBI,print_solve_stats= 1, obtain_timings= 1,monitor_residual= 1, convergence= RELATIVE_INI_CORE, tolerance= 1e-14, norm= L2,max_iters=10000"));
 
@@ -161,7 +180,8 @@ int initialize_amgx(int *crs_data, double *data, int *col_ind, int *row_ptr, dou
     
     AMGX_vector_get_size(x, &sol_size, &sol_bsize);
     /* Input your initial guess, x */
-    AMGX_vector_set_zero(x, n, bsize_x);
+    //AMGX_vector_set_zero(x, n, bsize_x);
+    AMGX_vector_upload(x, N, 1, sol);
 
 
     /* solver setup */
@@ -214,7 +234,8 @@ int solveamg(double *rhs, double *sol)
     
     // AMGX_vector_get_size(x, &sol_size, &sol_bsize);
     /* Input your initial guess, x */
-    AMGX_vector_set_zero(x, n, bsize_x);
+    //AMGX_vector_set_zero(x, n, bsize_x);
+    AMGX_vector_upload(x, N, 1, sol);
 
 
     /* solver setup */
