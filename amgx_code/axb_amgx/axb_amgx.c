@@ -129,6 +129,26 @@ int initialize_amgx(int *crs_data, double *data, int *col_ind, int *row_ptr, dou
     print_grid_stats=0,\
     obtain_timings=0"));
 
+    ///* Specify configuration */
+    //AMGX_SAFE_CALL(AMGX_config_create(&cfg,
+    //"config_version=2,\
+    //solver(my_solver)=FGMRES,\
+    //my_solver:gmres_n_restart=20,\
+    //my_solver:max_iters=10000,\
+    //my_solver:norm=L2,\
+    //my_solver:convergence=RELATIVE_INI_CORE,\
+    //my_solver:monitor_residual=1,\
+    //my_solver:tolerance=1e-5,\
+    //my_solver:preconditioner(amg_solver)=AMG,\
+    //amg_solver:algorithm=CLASSICAL,\
+    //amg_solver:max_iters=2,\
+    //amg_solver:presweeps=1,\
+    //amg_solver:postsweeps=1,\
+    //amg_solver:cycle=V,\
+    //my_solver:print_solve_stats=1,\
+    //my_solver:print_grid_stats=1,\
+    //my_solver:obtain_timings=1"));
+
     //AMGX_SAFE_CALL(AMGX_config_create(&cfg, "config_version=2, solver(amg_solver)=AMG"));
     //AMGX_SAFE_CALL(AMGX_config_create(&cfg, "config_version=2, solver(amg_solver)=AMG, amg_solver:print_solve_stats=0,amg_solver: monitor_residual=1, amg_solver:max_iters=1000000, amg_solver:tolerance=0.00000000000001, amg_solver:norm=L2, amg_solver:store_res_history=0, amg_solver:obtain_timings=0"));
     //AMGX_SAFE_CALL(AMGX_config_create(&cfg, "config_version=2, solver(amg_solver)=AMG, amg_solver:print_solve_stats=1,amg_solver: monitor_residual=1, amg_solver:max_iters=1000000, amg_solver:tolerance=0.0000000001, amg_solver:norm=L2, amg_solver:store_res_history=1, amg_solver:obtain_timings=1")); 
